@@ -115,6 +115,7 @@
             this.rtxtConsole = new System.Windows.Forms.RichTextBox();
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
+            this.cbAutoUpdate = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.gbEEPROMFile.SuspendLayout();
@@ -181,7 +182,7 @@
             this.btnProgram.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnProgram.Location = new System.Drawing.Point(6, 356);
             this.btnProgram.Name = "btnProgram";
-            this.btnProgram.Size = new System.Drawing.Size(176, 23);
+            this.btnProgram.Size = new System.Drawing.Size(141, 23);
             this.btnProgram.TabIndex = 8;
             this.btnProgram.Text = "_DOPROGRAM";
             this.btnProgram.UseVisualStyleBackColor = true;
@@ -826,7 +827,7 @@
             // btnForceStop
             // 
             this.btnForceStop.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btnForceStop.Location = new System.Drawing.Point(188, 356);
+            this.btnForceStop.Location = new System.Drawing.Point(150, 356);
             this.btnForceStop.Name = "btnForceStop";
             this.btnForceStop.Size = new System.Drawing.Size(75, 23);
             this.btnForceStop.TabIndex = 9;
@@ -869,13 +870,13 @@
             // tssStatus
             // 
             this.tssStatus.Name = "tssStatus";
-            this.tssStatus.Size = new System.Drawing.Size(88, 17);
+            this.tssStatus.Size = new System.Drawing.Size(86, 17);
             this.tssStatus.Text = "_STATUSREADY";
             // 
             // toolStripStatusLabel1
             // 
             this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
-            this.toolStripStatusLabel1.Size = new System.Drawing.Size(525, 17);
+            this.toolStripStatusLabel1.Size = new System.Drawing.Size(527, 17);
             this.toolStripStatusLabel1.Spring = true;
             // 
             // tssTooltip
@@ -1030,6 +1031,7 @@
             // 
             // splitContainer1.Panel1
             // 
+            this.splitContainer1.Panel1.Controls.Add(this.cbAutoUpdate);
             this.splitContainer1.Panel1.Controls.Add(this.groupBox2);
             this.splitContainer1.Panel1.Controls.Add(this.btnProgram);
             this.splitContainer1.Panel1.Controls.Add(this.txtCmdLine);
@@ -1051,6 +1053,17 @@
             this.splitContainer1.Size = new System.Drawing.Size(630, 410);
             this.splitContainer1.SplitterDistance = 440;
             this.splitContainer1.TabIndex = 38;
+            // 
+            // cbAutoUpdate
+            // 
+            this.cbAutoUpdate.AutoSize = true;
+            this.cbAutoUpdate.Location = new System.Drawing.Point(231, 360);
+            this.cbAutoUpdate.Name = "cbAutoUpdate";
+            this.cbAutoUpdate.Size = new System.Drawing.Size(106, 17);
+            this.cbAutoUpdate.TabIndex = 37;
+            this.cbAutoUpdate.Text = "_AUTOUPDATE";
+            this.cbAutoUpdate.UseVisualStyleBackColor = true;
+            this.cbAutoUpdate.CheckedChanged += new System.EventHandler(this.cbAutoUpdate_CheckedChanged);
             // 
             // Form1
             // 
@@ -1192,6 +1205,7 @@
         private System.Windows.Forms.SaveFileDialog saveFileDialog1;
         private System.Windows.Forms.Label lblSig;
         private System.Windows.Forms.SplitContainer splitContainer1;
+        private System.Windows.Forms.CheckBox cbAutoUpdate;
     }
 }
 

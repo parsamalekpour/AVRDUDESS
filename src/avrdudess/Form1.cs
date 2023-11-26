@@ -48,6 +48,8 @@ namespace avrdudess
         private readonly List<Programmer> programmers;
         private readonly List<MCU> mcus;
 
+        FileSystemWatcher fwatcher = new FileSystemWatcher();
+
         #region Control getters and setters
 
         public Programmer prog
@@ -905,8 +907,22 @@ namespace avrdudess
             // NOTE: Radio button change doesn't generate an event here
             cmdLine.generate();
             enableControls();
+            //
+            fwatcher.Path = Path.GetDirectoryName(txtFlashFile.Text);
+            fwatcher.Filter = Path.GetFileName(txtFlashFile.Text);
+            fwatcher.NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite | NotifyFilters.FileName;
+            fwatcher.Changed += new FileSystemEventHandler(FlashFileChanged);
+           
         }
 
+   
+
+        private void FlashFileChanged(object sender, FileSystemEventArgs e)
+        {
+          
+          avrdude.launch(txtCmdLine.Text);
+            
+        }
         // Programmer choice changed
         private void cmbProg_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -1170,6 +1186,7 @@ namespace avrdudess
         // Program!
         private void btnProgram_Click(object sender, EventArgs e)
         {
+            gbFlashFile.ForeColor = Color.Black;
             avrdude.launch(txtCmdLine.Text);
         }
 
@@ -1518,5 +1535,10 @@ namespace avrdudess
         }
 
         #endregion
+
+        private void cbAutoUpdate_CheckedChanged(object sender, EventArgs e)
+        {
+            fwatcher.EnableRaisingEvents = cbAutoUpdate.Checked;
+        }
     }
 }
