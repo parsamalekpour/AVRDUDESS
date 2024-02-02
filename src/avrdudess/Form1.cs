@@ -56,7 +56,7 @@ namespace avrdudess
         {
             get
             {
-                Programmer item = ((Programmer)cmbProg.SelectedItem);
+                Programmer item = new Programmer("usbasp");
                 if (item == null || item.id == "")
                     return null;
                 return item;
@@ -64,9 +64,7 @@ namespace avrdudess
             set
             {
                 Programmer p = programmers.Find(s => s.id == value.id);
-                if (p != null)
-                    cmbProg.SelectedItem = p;
-                else
+                if (p == null)
                     Util.consoleWarning("_PROGNOTFOUND", value.id);
             }
         }
@@ -90,23 +88,10 @@ namespace avrdudess
             }
         }
 
-        public string port
-        {
-            get { return cmbPort.Text.Trim(); }
-            set { cmbPort.Text = value; }
-        }
+    
 
-        public string baudRate
-        {
-            get { return txtBaudRate.Text.Trim(); }
-            set { txtBaudRate.Text = value; }
-        }
+      
 
-        public string bitClock
-        {
-            get { return txtBitClock.Text.Trim(); }
-            set { txtBitClock.Text = value; }
-        }
 
         public bool force
         {
@@ -245,11 +230,7 @@ namespace avrdudess
             set { txtLock.Text = value; }
         }
 
-        public string additionalSettings
-        {
-            get { return txtAdditional.Text; }
-            set { txtAdditional.Text = value; }
-        }
+      
 
         public byte verbosity
         {
@@ -285,9 +266,10 @@ namespace avrdudess
         private void Form1_Load(object sender, EventArgs e)
         {
             setWindowTitle();
+            fwatcher.Changed += new FileSystemEventHandler(FlashFileChanged);
 
             //MaximumSize = new Size(Size.Width, int.MaxValue);
-            MinimumSize = new Size(Size.Width, Height - rtxtConsole.Height);
+            //MinimumSize = new Size(Size.Width, Height - rtxtConsole.Height);
 
             // Persist window location across sessions
             // Credits:
@@ -353,7 +335,7 @@ namespace avrdudess
             enableClientAreaDrag(Controls);
 
             // Update serial ports etc
-            cmbPort.DropDown += cbPort_DropDown;
+            //cmbPort.DropDown += cbPort_DropDown;
 
             // Drag and drop flash file
             gbFlashFile.AllowDrop = true;
@@ -368,11 +350,8 @@ namespace avrdudess
             updateProgMCUComboBoxes();
             
             // USBasp frequency settings
-            cmbUSBaspFreq.Hide();
             setComboBoxDataSource(cmbUSBaspFreq, Avrdude.USBaspFreqs, "name");
-            cmbUSBaspFreq.Width = txtBitClock.Width;
-            cmbUSBaspFreq.Left = txtBitClock.Left;
-            cmbUSBaspFreq.Top = txtBitClock.Top;
+     
 
             // Flash & EEPROM file formats
             setComboBoxDataSource(cmbFlashFormat, Avrdude.fileFormats, "desc");
@@ -387,11 +366,11 @@ namespace avrdudess
             // Put tooltip stuff into a dictionary so we can loop over it while appling translations instead
             // of having a ton of individual calls to ToolTips.SetToolTip() and Language.Translation.get()
             tooltipData = new Dictionary<Control, string>() {
-                { cmbProg, "_TOOLTIP_PROGRAMMER" },
+                //{ cmbProg, "_TOOLTIP_PROGRAMMER" },
                 { cmbMCU, "_TOOLTIP_MCU" },
-                { cmbPort, "_TOOLTIP_PORT" },
-                { txtBaudRate, "_TOOLTIP_BAUDRATE" },
-                { txtBitClock, "_TOOLTIP_BITCLOCK" },
+               // { cmbPort, "_TOOLTIP_PORT" },
+              //  { txtBaudRate, "_TOOLTIP_BAUDRATE" },
+               // { txtBitClock, "_TOOLTIP_BITCLOCK" },
                 { txtFlashFile, "_TOOLTIP_FLASHFILE" },
                 { txtEEPROMFile, "_TOOLTIP_EEPROMFILE" },
                 { cbForce, "_TOOLTIP_FORCE" },
@@ -433,9 +412,9 @@ namespace avrdudess
             ToolTipCmdLine.SetToolTip(txtCmdLine, txtCmdLine.Text);
 
             // Load saved presets
-            presets = new Presets();
-            presets.load();
-            presets.setDataSource(cmbPresets);
+            //presets = new Presets();
+            //presets.load();
+            //presets.setDataSource(cmbPresets);
 
             // Enable/disable tool tips based on saved config
             ToolTips.Active = Config.Prop.toolTips;
@@ -443,22 +422,15 @@ namespace avrdudess
             // If a preset has not been specified by the command line then use the last used preset
             // Credits:
             // Uwe Tanger (specifying preset in command line)
-            if (presetToLoad == null)
-            {
-                cmbPresets.SelectedItem = presets.presets.Find(s => s.name == "Default");
-                loadPresetData(Config.Prop.previousSettings);
-            }
-            else
-            {
-                PresetData p = presets.presets.Find(s => s.name == presetToLoad);
-                cmbPresets.SelectedItem = (p != null) ? p : presets.presets.Find(s => s.name == "Default");
-            }
+           
+            loadPresetData(Config.Prop.previousSettings);
+            
 
             // Force update control enabled states and generate cmd line after loading preset data
             event_controlChanged(null, EventArgs.Empty);
 
             // Update control enabled states and generate cmd line whenever a control is changed
-            cmbProg.SelectedIndexChanged += event_controlChanged;
+            //cmbProg.SelectedIndexChanged += event_controlChanged;
             cmbMCU.SelectedIndexChanged += event_controlChanged;
             cbForce.CheckedChanged += event_controlChanged;
             cbNoVerify.CheckedChanged += event_controlChanged;
@@ -466,8 +438,8 @@ namespace avrdudess
             txtLFuse.TextChanged += event_controlChanged;
             txtEFuse.TextChanged += event_controlChanged;
             txtBitClock.TextChanged += event_controlChanged;
-            txtBaudRate.TextChanged += event_controlChanged;
-            cmbPort.TextChanged += event_controlChanged;
+            //txtBaudRate.TextChanged += event_controlChanged;
+            //cmbPort.TextChanged += event_controlChanged;
             txtEEPROMFile.TextChanged += event_controlChanged;
             cmbEEPROMFormat.SelectedIndexChanged += event_controlChanged;
             txtFlashFile.TextChanged += event_controlChanged;
@@ -479,7 +451,7 @@ namespace avrdudess
             cbDoNotWrite.CheckedChanged += event_controlChanged;
             cbDisableFlashErase.CheckedChanged += event_controlChanged;
             cbEraseFlashEEPROM.CheckedChanged += event_controlChanged;
-            txtAdditional.TextChanged += event_controlChanged;
+        
 
             Language.Translation.apply(this);
 
@@ -565,7 +537,7 @@ namespace avrdudess
         private void updateProgMCUComboBoxes()
         {
             setComboBoxDataSource(cmbMCU, null, "");
-            setComboBoxDataSource(cmbProg, null, "");
+            //setComboBoxDataSource(cmbProg, null, "");
 
             programmers.Clear();
             mcus.Clear();
@@ -590,9 +562,9 @@ namespace avrdudess
             setComboBoxDataSource(cmbMCU, mcus, "desc");
             cmbMCU.SelectedIndexChanged -= cmbMCU_SelectedIndexChanged;
             cmbMCU.SelectedIndexChanged += cmbMCU_SelectedIndexChanged;
-            setComboBoxDataSource(cmbProg, programmers, "desc");
-            cmbProg.SelectedIndexChanged -= cmbProg_SelectedIndexChanged;
-            cmbProg.SelectedIndexChanged += cmbProg_SelectedIndexChanged;
+            //setComboBoxDataSource(cmbProg, programmers, "desc");
+            //cmbProg.SelectedIndexChanged -= cmbProg_SelectedIndexChanged;
+           // cmbProg.SelectedIndexChanged += cmbProg_SelectedIndexChanged;
         }
 
         // Set combo box data source etc
@@ -848,57 +820,9 @@ namespace avrdudess
         // Port drop down, refresh available ports
         private void cbPort_DropDown(object sender, EventArgs e)
         {
-            cmbPort.Items.Clear();
+            //cmbPort.Items.Clear();
 
-            PlatformID os = Environment.OSVersion.Platform;
-            if (os == PlatformID.Unix || os == PlatformID.MacOSX)
-            {
-                string[] devPrefixs = new string[]
-                {
-                    "ttyS", // Normal serial port
-                    "ttyUSB", // USB <-> serial converter
-                    "ttyACM", // USB <-> serial converter (usually an Arduino)
-                    "lp" // Parallel port
-                };
-
-                // https://stackoverflow.com/questions/434494/serial-port-rs232-in-mono-for-multiple-platforms
-                string[] devs;
-                try
-                {
-                    devs = Directory.GetFiles("/dev/", "*", SearchOption.TopDirectoryOnly);
-                }
-                catch (Exception)
-                {
-                    return;
-                }
-
-                Array.Sort(devs);
-
-                // Loop through each device
-                foreach (string dev in devs)
-                {
-                    // See if device starts with one of the prefixes
-                    foreach (string prefix in devPrefixs)
-                    {
-                        if (dev.StartsWith("/dev/" + prefix))
-                        {
-                            cmbPort.Items.Add(dev);
-                            break;
-                        }
-                    }
-                }
-            }
-            else // Windows
-            {
-                string[] ports = SerialPort.GetPortNames();
-                foreach (string p in ports)
-                    cmbPort.Items.Add(p);
-
-                cmbPort.Items.Add("usb");
-                cmbPort.Items.Add("lpt1");
-                cmbPort.Items.Add("lpt2");
-                cmbPort.Items.Add("lpt3");
-            }
+            
         }
 
         // General event for when a control changes
@@ -908,10 +832,19 @@ namespace avrdudess
             cmdLine.generate();
             enableControls();
             //
-            fwatcher.Path = Path.GetDirectoryName(txtFlashFile.Text);
-            fwatcher.Filter = Path.GetFileName(txtFlashFile.Text);
-            fwatcher.NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite | NotifyFilters.FileName;
-            fwatcher.Changed += new FileSystemEventHandler(FlashFileChanged);
+            try
+            {
+                fwatcher.Path = Path.GetDirectoryName(txtFlashFile.Text);
+                fwatcher.Filter = Path.GetFileName(txtFlashFile.Text);
+                fwatcher.NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite;
+                
+            }
+            catch (Exception)
+            {
+
+               // throw;
+            }
+            
            
         }
 
@@ -919,55 +852,12 @@ namespace avrdudess
 
         private void FlashFileChanged(object sender, FileSystemEventArgs e)
         {
-          
-          avrdude.launch(txtCmdLine.Text);
-            
+            fwatcher.EnableRaisingEvents = false;
+            Thread.Sleep(3000);
+            avrdude.launch(txtCmdLine.Text);
+            fwatcher.EnableRaisingEvents = true;
         }
-        // Programmer choice changed
-        private void cmbProg_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            // Credits:
-            // Simone Chifari (USBasp frequency stuff)
-
-            // Hide/show USBasp frequency/bit clock boxes
-
-            if (prog != null && prog.id == "usbasp") // USBasp has been selected
-            {
-                if (txtBitClock.Visible)
-                {
-                    // Store bit clock
-                    oldBitClock = txtBitClock.Text;
-
-                    // Show/hide stuff
-                    txtBitClock.Hide();
-                    cmbUSBaspFreq.Show();
-
-                    // Make sure a selected index changed event occurs
-                    cmbUSBaspFreq.SelectedIndex = -1;
-
-                    // Restore USBasp frequency
-                    if (oldUsbAspFreq != null)
-                        cmbUSBaspFreq.SelectedItem = oldUsbAspFreq;
-                    else
-                        cmbUSBaspFreq.SelectedIndex = 0;
-                }
-            }
-            else
-            {
-                if (!txtBitClock.Visible)
-                {
-                    // Store selected USBasp frequency
-                    oldUsbAspFreq = ((Avrdude.UsbAspFreq)cmbUSBaspFreq.SelectedItem);
-
-                    // Restore bit clock
-                    txtBitClock.Text = oldBitClock;
-
-                    // Show/hide stuff
-                    txtBitClock.Show();
-                    cmbUSBaspFreq.Hide();
-                }
-            }
-        }
+  
 
         // MCU choice changed
         private void cmbMCU_SelectedIndexChanged(object sender, EventArgs e)
@@ -1205,9 +1095,9 @@ namespace avrdudess
             PresetData preset = new PresetData(name);
             preset.programmer = (prog != null) ? prog.id : "";
             preset.mcu = (mcu != null) ? mcu.id : "";
-            preset.port = port;
-            preset.baud = baudRate;
-            preset.bitclock = bitClock;
+            //preset.port = port;
+           // preset.baud = baudRate;
+           // preset.bitclock = bitClock;
             preset.flashFile = flashFile;
             preset.flashFormat = flashFileFormat;
             preset.flashOp = flashFileOperation;
@@ -1225,7 +1115,7 @@ namespace avrdudess
             preset.setFuses = setFuses;
             preset.lockBits = lockSetting;
             preset.setLock = setLock;
-            preset.additional = additionalSettings;
+      
             preset.verbosity = verbosity;
 
             return preset;
@@ -1235,9 +1125,9 @@ namespace avrdudess
         {
             prog = new Programmer(item.programmer);
             mcu = new MCU(item.mcu);
-            port = item.port;
-            baudRate = item.baud;
-            bitClock = item.bitclock;
+            //port = item.port;
+            //baudRate = item.baud;
+            //bitClock = item.bitclock;
             flashFile = item.flashFile;
             flashFileFormat = item.flashFormat;
             flashFileOperation = item.flashOp;
@@ -1255,7 +1145,7 @@ namespace avrdudess
             setFuses = item.setFuses;
             lockSetting = item.lockBits;
             setLock = item.setLock;
-            additionalSettings = item.additional;
+      
             verbosity = item.verbosity;
 
             // If preset uses USBasp we need to workout the frequency to use from the bit clock
@@ -1292,13 +1182,7 @@ namespace avrdudess
             }
         }
 
-        // Preset choice changed
-        private void cmbPresets_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            PresetData item = (PresetData)cmbPresets.SelectedItem;
-            if (item != null)
-                loadPresetData(item);
-        }
+        
 
         // Fuse link clicked
         // Credits:
@@ -1539,6 +1423,11 @@ namespace avrdudess
         private void cbAutoUpdate_CheckedChanged(object sender, EventArgs e)
         {
             fwatcher.EnableRaisingEvents = cbAutoUpdate.Checked;
+        }
+
+        private void cmdVerbose_SelectedIndexChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }

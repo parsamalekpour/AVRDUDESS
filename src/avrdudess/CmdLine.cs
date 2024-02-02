@@ -37,14 +37,14 @@ namespace avrdudess
             if (mainForm.mcu != null && mainForm.mcu.id.Length > 0 && addMCU)
                 cmdLineOption("p", mainForm.mcu.id);
 
-            if (mainForm.port.Length > 0)
-                cmdLineOption("P", mainForm.port);
+            //if (mainForm.port.Length > 0)
+             //   cmdLineOption("P", mainForm.port);
 
-            if (mainForm.baudRate.Length > 0)
-                cmdLineOption("b", mainForm.baudRate);
+            //if (mainForm.baudRate.Length > 0)
+            //    cmdLineOption("b", mainForm.baudRate);
 
-            if (mainForm.bitClock.Length > 0)
-                cmdLineOption("B", mainForm.bitClock);
+            if (mainForm.cmbUSBaspFreq.SelectedText.Length > 0)
+                cmdLineOption("B", mainForm.cmbUSBaspFreq.SelectedText);
 
             if (mainForm.force)
                 cmdLineOption("F");
@@ -57,8 +57,7 @@ namespace avrdudess
         {
             generateMain(false);
 
-            if (mainForm.additionalSettings.Length > 0)
-                sb.Append(mainForm.additionalSettings + " ");
+       
 
             // AVRDUDE needs -p defined to work, so just set m8
             cmdLineOption("p", "m8");
@@ -70,8 +69,7 @@ namespace avrdudess
         {
             generateMain();
 
-            if (mainForm.additionalSettings.Length > 0)
-                sb.Append(mainForm.additionalSettings + " ");
+    
 
             for (int i = 0; i < types.Length; i++)
                 cmdLineOption("U", string.Format("{0}:r:-:h", types[i].GetDescription()));
@@ -83,8 +81,7 @@ namespace avrdudess
         {
             generateMain();
 
-            if (mainForm.additionalSettings.Length > 0)
-                sb.Append(mainForm.additionalSettings + " ");
+
 
             addWriteFuses();
 
@@ -95,8 +92,7 @@ namespace avrdudess
         {
             generateMain();
 
-            if (mainForm.additionalSettings.Length > 0)
-                sb.Append(mainForm.additionalSettings + " ");
+
 
             makeWriteFuseLock(Avrdude.FuseLockType.Lock, mainForm.lockSetting);
 
@@ -116,8 +112,6 @@ namespace avrdudess
             if (mainForm.eraseFlashAndEEPROM)
                 cmdLineOption("e");
 
-            if (mainForm.additionalSettings.Length > 0)
-                sb.Append(mainForm.additionalSettings + " ");
 
             if (mainForm.flashFile.Length > 0)
                 cmdLineOption("U", string.Format("flash:{0}:\"{1}\":{2}", mainForm.flashFileOperation, mainForm.flashFile, mainForm.flashFileFormat));
@@ -138,8 +132,6 @@ namespace avrdudess
             if (mainForm.eraseFlashAndEEPROM)
                 cmdLineOption("e");
 
-            if (mainForm.additionalSettings.Length > 0)
-                sb.Append(mainForm.additionalSettings + " ");
 
             if (mainForm.EEPROMFile.Length > 0)
                 cmdLineOption("U", string.Format("eeprom:{0}:\"{1}\":{2}", mainForm.EEPROMFileOperation, mainForm.EEPROMFile, mainForm.EEPROMFileFormat));
@@ -163,8 +155,6 @@ namespace avrdudess
             if (mainForm.doNotWrite)
                 cmdLineOption("n");
 
-            if (mainForm.additionalSettings.Length > 0)
-                sb.Append(mainForm.additionalSettings + " ");
 
             if (mainForm.flashFile.Length > 0)
                 cmdLineOption("U", string.Format("flash:{0}:\"{1}\":{2}", mainForm.flashFileOperation, mainForm.flashFile, mainForm.flashFileFormat));
